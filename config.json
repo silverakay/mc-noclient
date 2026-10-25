@@ -1,0 +1,19 @@
+{
+  "_说明": "改这里就行。servers 可以写多个，工具会逐个尝试。",
+  "username": "YourName",
+  "servers": [
+    {
+      "name": "正版验证测试服",
+      "host": "127.0.0.1",
+      "port": 25611
+    }
+  ],
+  "behavior": {
+    "keepAlive": true,
+    "showChat": true,
+    "greet": "",
+    "commands": [],
+    "reconnect": false,
+    "reconnectDelaySec": 10
+  }
+}

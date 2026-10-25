@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>芒果端辅助</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 顶栏 -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">MC</div>
+    <div class="brand-text">
+      <h1>芒果端辅助</h1>
+      <span class="ver">V6.4 · MC 26.2 · 协议 776</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="pill">
+      <span class="dot off" id="dot-account"></span>
+      <span id="text-account">未登录账号</span>
+    </div>
+    <button class="btn-ghost icon-button" id="btn-settings" title="设置" aria-label="设置"><img class="settings-icon" src="icons/settings.svg" alt="" aria-hidden="true"></button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- 左栏 -->
+  <aside class="col-left">
+
+    <!-- 账号卡 -->
+    <section class="card">
+      <div class="card-head">
+        <h2>正版账号</h2>
+        <span class="tag" id="premium-tag">未登录</span>
+      </div>
+      <div class="card-body">
+        <div class="skin-box">
+          <div class="skin-avatar" id="skin-avatar">?</div>
+          <div class="skin-info">
+            <div class="skin-name" id="skin-name">—</div>
+            <div class="skin-uuid" id="skin-uuid">登录后显示正版档案</div>
+          </div>
+        </div>
+        <div class="account-switcher hidden" id="account-switcher">
+          <div class="account-switcher-head">
+            <span>已保存账号</span><span class="account-count" id="account-count"></span>
+          </div>
+          <div class="account-switcher-row">
+            <select id="account-select" aria-label="选择已保存账号"></select>
+            <button class="btn ghost small" id="btn-account-switch">切换</button>
+          </div>
+          <div class="account-switcher-note" id="account-switcher-note">切换会刷新当前账号的正版凭据</div>
+        </div>
+        <p class="hint">
+          登录采用微软官方设备代码流程：点「登录微软账号」后，
+          把程序给出的<b>短代码</b>填进浏览器页面即可，无需输入密码。
+        </p>
+        <div class="btn-row">
+          <button class="btn primary" id="btn-login">登录微软账号</button>
+          <button class="btn ghost small" id="btn-relogin" title="强制重新授权">重新授权</button>
+        </div>
+
+        <!-- 设备代码提示条：登录过程中显示短代码，醒目、可点击复制 -->
+        <div class="device-code hidden" id="device-code">
+          <div class="dc-head">
+            <span class="dc-title">请在浏览器中输入以下代码</span>
+            <button class="btn-ghost tiny dc-copy" id="dc-copy" title="复制代码">复制</button>
+          </div>
+          <div class="dc-code" id="dc-code">————</div>
+          <div class="dc-foot">
+            <span class="dc-uri" id="dc-uri">https://www.microsoft.com/link</span>
+            <button class="btn-ghost tiny" id="dc-open">重新打开</button>
+          </div>
+        </div>
+
+        <button class="btn danger-ghost full hidden" id="btn-logout">移除当前账号</button>
+      </div>
+    </section>
+
+    <!-- 服务器卡 -->
+    <section class="card grow">
+      <div class="card-head">
+        <h2>服务器</h2>
+        <button class="btn-ghost tiny" id="btn-add">+ 添加</button>
+      </div>
+      <div class="card-body no-pad">
+        <div class="server-list" id="server-list"></div>
+      </div>
+    </section>
+
+    <section class="card mon-card" id="monitor-panel">
+      <div class="card-head">
+        <h2>资源占用</h2>
+        <button class="btn-ghost tiny" id="btn-mon-detail" aria-expanded="false" aria-controls="mon-detail">明细</button>
+      </div>
+      <div class="mon-body">
+        <div class="mon-top"><span class="mon-label">CPU</span><span class="mon-val" id="mon-cpu" title="实时占用 / 本次运行最高占用">— / —</span></div>
+        <div class="mon-top"><span class="mon-label">内存</span><span class="mon-val" id="mon-mem" title="实时占用 / 本次运行最高占用">— / —</span></div>
+      </div>
+      <div class="mon-detail hidden" id="mon-detail">
+        <div class="mon-detail-head"><span>进程</span><span>CPU</span><span>内存</span></div>
+        <div class="mon-detail-body" id="mon-detail-body"></div>
+      </div>
+    </section>
+
+  </aside>
+
+  <!-- 右栏 -->
+  <section class="col-right">
+
+    <!-- 连接面板 -->
+    <div class="card conn-card">
+      <div class="conn-left">
+        <div class="conn-modes" role="group" aria-label="连接模式">
+          <label><input type="radio" id="mode-standalone" name="connection-mode" value="standalone" checked><span>独立连接</span></label>
+          <label><input type="radio" id="mode-bridge" name="connection-mode" value="bridge"><span>游戏桥接</span></label>
+        </div>
+        <div class="conn-target">
+          <div class="conn-host" id="conn-host">未选择服务器</div>
+          <div class="conn-meta" id="conn-meta">在左侧选择一台服务器</div>
+        </div>
+        <div class="conn-stats">
+          <div class="stat"><span class="k">状态</span><span class="v" id="st-state">空闲</span></div>
+          <div class="stat"><span class="k">在线</span><span class="v" id="st-uptime">—</span></div>
+          <div class="stat"><span class="k">收/发</span><span class="v" id="st-traffic">—</span></div>
+          <div class="stat"><span class="k">验证</span><span class="v" id="st-auth">—</span></div>
+        </div>
+      </div>
+      <div class="conn-right">
+        <button class="btn ghost small hidden" id="btn-bridge-export" title="导出游戏 Mod 配对文件">导出配对</button>
+        <button class="btn primary big" id="btn-connect">连接</button>
+      </div>
+    </div>
+
+    <!-- 聊天 + 日志面板 -->
+    <div class="card log-card grow">
+      <div class="card-head">
+        <div class="tabs">
+          <button class="tab active" id="tab-chat">聊天<span class="badge hidden" id="chat-badge">0</span></button>
+          <button class="tab" id="tab-log">运行日志</button>
+          <button class="tab" id="tab-presence">在线玩家</button>
+          <button class="tab" id="tab-purchase">每日收购</button>
+          <button class="tab" id="tab-attention">关注<span class="badge hidden" id="attention-badge">0</span></button>
+        </div>
+        <div class="log-tools">
+          <select class="message-filter" id="chat-filter" aria-label="聊天分类" title="聊天分类">
+            <option value="all">全部消息</option><option value="player">玩家聊天</option>
+            <option value="system">服务器通知</option><option value="redpacket">红包消息</option>
+            <option value="actionbar">快捷栏提示</option>
+            <option value="presence">进出服记录</option>
+          </select>
+          <select class="message-filter hidden" id="log-filter" aria-label="日志分类" title="日志分类">
+            <option value="all">全部日志</option><option value="connection">连接与协议</option>
+            <option value="auth">账号登录</option><option value="automation">自动化动作</option>
+            <option value="chat">玩家监测</option><option value="error">错误</option><option value="app">应用操作</option>
+          </select>
+          <button class="btn-ghost tiny hidden" id="btn-load-earlier" type="button">加载更早聊天</button>
+          <button class="btn-ghost tiny" id="btn-clear">清空</button>
+        </div>
+      </div>
+      <div class="chat-diagnostics hidden" id="chat-diagnostics" role="status">尚无接收诊断</div>
+      <div class="log-view chat-view" id="chat-view">
+        <div class="chat-empty" id="chat-empty">连接服务器后，这里显示服务器的聊天与广播</div>
+      </div>
+      <div class="log-view hidden" id="log-view"></div>
+      <div class="presence-view hidden" id="presence-view">
+        <div class="presence-server" id="presence-server">未选择服务器</div>
+        <div class="presence-search">
+          <input id="presence-name" type="text" maxlength="16" placeholder="筛选在线玩家" aria-label="筛选在线玩家" spellcheck="false">
+        </div>
+        <div class="online-heading" id="online-count" role="status">尚未收到玩家列表</div>
+        <div class="online-players" id="online-players" aria-label="服务器玩家列表"></div>
+        <div class="presence-summary" id="presence-summary" role="status">暂无在线名单</div>
+      </div>
+      <div class="purchase-view hidden" id="purchase-view">
+        <div class="purchase-heading"><h2>今日收购价</h2><button class="btn ghost small" id="purchase-retry" type="button">获取收购价</button></div>
+        <div class="purchase-meta" id="purchase-meta" role="status">今日自动 0/1 · 手动成功 0 次</div>
+        <p class="purchase-empty" id="purchase-empty">尚未获取今日收购价</p>
+        <div id="purchase-shops"></div>
+      </div>
+      <div class="attention-view hidden" id="attention-view">
+        <div class="attention-heading"><h2>关注</h2><label class="attention-pause"><input id="attention-pause" type="checkbox">暂停自动化</label></div>
+        <p id="attention-scope" class="attention-meta"></p>
+        <section class="attention-summary"><h3>未查看期间 · 本次运行所有连接</h3><p id="attention-summary">本次运行尚无未查看摘要</p></section>
+        <p id="attention-availability" class="attention-meta" role="status"></p>
+        <div class="attention-tabs" role="group" aria-label="关注视图">
+          <button id="attention-actions-tab" class="active" type="button">动作记录</button>
+          <button id="attention-messages-tab" type="button">重要消息</button>
+        </div>
+        <div id="attention-actions"></div>
+        <div id="attention-messages" class="hidden"><div id="attention-message-list"></div></div>
+        <p id="attention-error" class="settings-error" role="alert"></p>
+      </div>
+      <div class="card-foot send-bar" id="send-bar">
+        <select class="shortcut-select" id="shortcut-select" aria-label="快捷指令" title="快捷指令"><option value="">快捷指令</option></select>
+        <input type="text" id="inp-send" placeholder="连接后可直接发消息，以 / 开头则是命令" spellcheck="false" disabled>
+        <button class="btn primary small" id="btn-send" disabled>发送</button>
+        <div class="completion-list hidden" id="completion-list" role="listbox" aria-label="命令补全"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
+  <form id="settings-form">
+    <div class="settings-head">
+      <h2 id="settings-title">设置</h2>
+      <button class="btn-ghost icon-button" id="settings-close" type="button" title="关闭设置" aria-label="关闭设置"><img class="close-icon" src="icons/x.svg" alt="" aria-hidden="true"></button>
+    </div>
+    <div class="settings-body">
+      <p id="settings-profile" class="attention-meta"></p>
+      <fieldset class="settings-group">
+        <legend>桥接下线</legend>
+        <label class="setting-row"><span>任一目标玩家在线时退出游戏服务器</span><input type="checkbox" id="chk-bridge-exit"></label>
+        <div class="bridge-target-heading"><span>目标玩家</span><span id="bridge-exit-count">0 / 16</span></div>
+        <div id="bridge-exit-selected" class="bridge-target-selected" role="group" aria-label="已选目标玩家"></div>
+        <div class="bridge-target-search">
+          <input id="bridge-exit-player" type="search" maxlength="16" placeholder="搜索在线玩家或输入玩家 ID" aria-label="搜索或添加目标玩家" spellcheck="false" autocomplete="off" aria-controls="bridge-exit-players">
+          <button class="btn small" id="bridge-exit-add" type="button">添加</button>
+        </div>
+        <div id="bridge-exit-players" class="bridge-target-options" role="group" aria-label="在线玩家候选"></div>
+        <p id="bridge-exit-error" class="settings-error" role="alert"></p>
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend>连接</legend>
+        <label class="setting-row"><span>游戏下线后独立接管</span><select id="sel-bridge-fallback"><option value="off">关闭</option><option value="exit">仅桥接下线成功后</option><option value="offline">普通游戏下线后也接管</option></select></label>
+        <label class="setting-row"><span>意外断开后自动重连</span><input type="checkbox" id="chk-reconnect"></label>
+        <label class="setting-row"><span>起始重连间隔（秒）</span><input type="number" id="inp-reconnect-delay" min="3" max="60" step="1" required></label>
+        <label class="setting-row"><span>重试上限（0 为不限）</span><input type="number" id="inp-reconnect-attempts" min="0" max="1000" step="1" required></label>
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend>账号</legend>
+        <label class="setting-row"><span>启动时自动登录账号</span><input type="checkbox" id="chk-autologin"></label>
+        <label class="setting-row"><span>关闭窗口时</span><select id="sel-close-behavior"><option value="quit">结束程序</option><option value="background">后台运行（托盘）</option></select></label>
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend>消息动作</legend>
+        <label class="setting-row"><span>自动点击红包领取入口</span><input type="checkbox" id="chk-autoclaim"></label>
+        <label class="setting-row"><span>按领取人数触发</span><input type="checkbox" id="chk-claim-after"></label>
+        <label class="setting-row"><span>第几位玩家领取后立即领取</span><input type="number" id="inp-claim-after-count" min="1" max="1000" step="1" required></label>
+        <label class="setting-row"><span>红包随机延迟</span><input type="checkbox" id="chk-claim-delay"></label>
+        <label class="setting-row"><span>红包延迟最小值（秒）</span><input type="number" id="inp-claim-delay-min" min="0" max="30" step="0.01" required></label>
+        <label class="setting-row"><span>红包延迟最大值（秒）</span><input type="number" id="inp-claim-delay-max" min="0" max="30" step="0.01" required></label>
+        <label class="setting-row"><span>自动点击欢迎（每日最多 10 次）</span><input type="checkbox" id="chk-autowelcome"></label>
+        <label class="setting-row"><span>欢迎随机延迟</span><input type="checkbox" id="chk-welcome-delay"></label>
+        <label class="setting-row"><span>欢迎延迟最小值（秒）</span><input type="number" id="inp-welcome-delay-min" min="0" max="30" step="0.01" required></label>
+        <label class="setting-row"><span>欢迎延迟最大值（秒）</span><input type="number" id="inp-welcome-delay-max" min="0" max="30" step="0.01" required></label>
+        <label class="setting-row"><span>暂停全部自动化</span><input type="checkbox" id="chk-pause-automation"></label>
+        <label class="setting-row"><span>独立连接自动获取每日收购价</span><input type="checkbox" id="chk-auto-purchase"></label>
+        <label class="setting-row"><span>每天本地 00:00:00 发送命令</span><input type="checkbox" id="chk-midnight"></label>
+        <label class="shortcut-label" for="inp-midnight-command">零点命令</label>
+        <input type="text" id="inp-midnight-command" maxlength="2048" placeholder="/命令" spellcheck="false" autocomplete="off">
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend>重要提醒</legend>
+        <label class="setting-row"><span>有人提到我</span><input type="checkbox" id="notify-mentions"></label>
+        <label class="setting-row"><span>已监测玩家发言</span><input type="checkbox" id="notify-players"></label>
+        <label class="setting-row"><span>维护结束或连接恢复失败</span><input type="checkbox" id="notify-connection"></label>
+        <label class="setting-row"><span>启用系统通知</span><input type="checkbox" id="notify-desktop"></label>
+        <label class="setting-row"><span>系统通知显示消息正文</span><input type="checkbox" id="notify-preview"></label>
+        <label class="setting-row"><span>静音时段</span><input type="checkbox" id="notify-quiet"></label>
+        <label class="setting-row"><span>开始</span><input type="time" id="notify-start" value="23:00" required></label>
+        <label class="setting-row"><span>结束</span><input type="time" id="notify-end" value="08:00" required></label>
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend>快捷指令</legend>
+        <label class="shortcut-label" for="settings-shortcuts">名称 | /命令（每行一条）</label>
+        <textarea class="shortcut-editor" id="settings-shortcuts" rows="4" maxlength="63000" placeholder="名称 | /命令" spellcheck="false"></textarea>
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend>显示</legend>
+        <label class="setting-row"><span>显示服务器聊天</span><input type="checkbox" id="chk-showchat"></label>
+        <label class="setting-row"><span>隐藏玩家进出服通知</span><input type="checkbox" id="chk-hidepresence"></label>
+        <label class="setting-row"><span>聊天与日志自动滚动</span><input type="checkbox" id="chk-autoscroll"></label>
+        <label class="setting-row"><span>运行日志界面保留</span><select id="sel-log-limit"><option value="200">200 条</option><option value="400">400 条</option><option value="800">800 条</option></select></label>
+        <label class="setting-row"><span>显示资源监控</span><input type="checkbox" id="chk-showmonitor"></label>
+        <label class="shortcut-label" for="settings-chat-blocklist">聊天屏蔽关键词</label>
+        <textarea class="shortcut-editor" id="settings-chat-blocklist" rows="3" maxlength="4096" placeholder="每行一个关键词" spellcheck="false"></textarea>
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend>记录与缓存</legend>
+        <div class="setting-row settings-data-path"><span>存储目录</span><span class="settings-value" id="history-path">默认目录</span></div>
+        <div class="setting-row settings-data"><span>聊天、日志与缓存</span><span class="settings-actions"><button class="btn ghost small" id="btn-history-path" type="button">选择目录</button><button class="btn ghost small" id="btn-history-open" type="button">打开目录</button></span></div>
+        <div class="setting-row settings-data"><span>配置文件</span><span class="settings-actions"><button class="btn ghost small" id="btn-data" type="button">打开数据目录</button><button class="btn ghost small" id="btn-diagnostic" type="button">生成诊断报告</button></span></div>
+        <div class="setting-row settings-data"><span>界面状态</span><button class="btn ghost small" id="btn-reload-renderer" type="button">重载界面</button></div>
+        <p class="settings-hint">记录最多保留 7 天，总预算 128 MiB；达到容量后先清理最早记录。</p>
+      </fieldset>
+      <p class="settings-error" id="settings-error" role="alert"></p>
+    </div>
+    <div class="settings-foot">
+      <button class="btn ghost small" id="settings-cancel" type="button">取消</button>
+      <button class="btn primary small" id="settings-save" type="submit">保存设置</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="server-menu-dialog" id="server-menu-dialog" aria-labelledby="server-menu-title">
+  <div class="settings-head">
+    <h2 id="server-menu-title">服务器菜单</h2>
+    <button class="btn-ghost icon-button" id="server-menu-close" type="button" title="关闭菜单" aria-label="关闭菜单"><img class="close-icon" src="icons/x.svg" alt="" aria-hidden="true"></button>
+  </div>
+  <div class="server-menu-body">
+    <div class="menu-status" id="server-menu-status" role="status">等待物品数据</div>
+    <div class="menu-grid" id="server-menu-grid" aria-label="菜单物品"></div>
+    <details id="server-inventory"><summary>随菜单下发的背包</summary><div class="menu-grid" id="server-inventory-grid" aria-label="背包物品"></div></details>
+  </div>
+</dialog>
+
+<!-- 添加服务器弹窗 -->
+<div class="modal-mask hidden" id="modal-add">
+  <div class="modal">
+    <h3>添加服务器</h3>
+    <label>名称<input type="text" id="add-name" placeholder="我的服务器"></label>
+    <label>地址<input type="text" id="add-host" placeholder="play.example.com" spellcheck="false"></label>
+    <label>端口<input type="text" id="add-port" value="25565" spellcheck="false"></label>
+    <div class="modal-btns">
+      <button class="btn ghost" id="add-cancel">取消</button>
+      <button class="btn primary" id="add-ok">添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- 提示条 -->
+<div class="toast hidden" id="toast"></div>
+
+<script src="../../src/chat_filter.js"></script>
+<script src="renderer.js"></script>
+<script src="attention.js"></script>
+</body>
+</html>

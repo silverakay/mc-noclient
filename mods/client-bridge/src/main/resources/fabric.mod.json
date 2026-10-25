@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "mc_noclient_bridge",
+  "version": "1.7.0",
+  "name": "MC NoClient Bridge",
+  "description": "Authenticated multi-instance bridge with confirmed game offline evidence for standalone handoff, game disconnect and passive monitoring for MC NoClient V6.4+.",
+  "authors": ["BaiXu"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": { "client": ["xyz.baixur.mcbridge.BridgeMod"] },
+  "mixins": ["mc-noclient-bridge.mixins.json"],
+  "depends": { "fabricloader": ">=0.19.3", "minecraft": "26.2", "java": ">=25",
+    "fabric-lifecycle-events-v1": "*" }
+}

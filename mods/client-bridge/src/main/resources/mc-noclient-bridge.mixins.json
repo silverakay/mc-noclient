@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "xyz.baixur.mcbridge.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": ["ChatPacketsMixin", "OutgoingPacketsMixin", "PurchaseScreenMixin"],
+  "injectors": { "defaultRequire": 1 }
+}

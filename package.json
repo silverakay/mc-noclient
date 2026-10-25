@@ -1,0 +1,71 @@
+{
+  "name": "mc-noclient",
+  "productName": "芒果端辅助",
+  "version": "6.4.0",
+  "description": "芒果端辅助 · 正版登录、游戏桥接与自动红包领取",
+  "main": "app/main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "node tools/unsigned_build.js",
+    "dist:unsigned": "node tools/unsigned_build.js"
+  },
+  "author": "BaiXu",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "forceCodeSigning": false,
+    "appId": "xyz.baixur.mc-noclient",
+    "productName": "芒果端辅助",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "app/**/*",
+      "src/**/*",
+      "package.json",
+      "!**/*.log",
+      "!**/ui_selftest.png",
+      "!**/proto_tmp.json",
+      "!src/_*_tmp_*.js"
+    ],
+    "win": {
+      "signtoolOptions": {
+        "signingHashAlgorithms": ["sha256"]
+      },
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "芒果端辅助-未签名-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "芒果端辅助-未签名便携版-${version}.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "芒果端辅助",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "artifactName": "芒果端辅助-未签名安装版-${version}.exe"
+    }
+  },
+  "dependencies": {
+    "prismarine-nbt": "2.8.0",
+    "protodef": "1.19.0",
+    "uuid-1345": "1.0.2"
+  }
+}
